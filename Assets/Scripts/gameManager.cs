@@ -27,6 +27,8 @@ public class gameManager : MonoBehaviour
     public GameObject firstCard;
     public GameObject secondCard;
 
+    public AudioClip match;
+    public AudioSource audioSource;
     // Start is called before the first frame update
     void Awake()
     {
@@ -82,7 +84,7 @@ public class gameManager : MonoBehaviour
         {
             matchtime -= Time.deltaTime;
             matchTimeTxt.text = matchtime.ToString("N2");
-
+            
             if (matchtime < 0.0f)
             {
                 firstCard.GetComponent<card>().closeCard();
