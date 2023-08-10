@@ -162,7 +162,7 @@ public class gameManager : MonoBehaviour
                 PlayerPrefs.SetFloat("maxBestScore", thisScore);
             }
         }
-        maxScoreTxt.text = PlayerPrefs.GetFloat("maxBestScore").ToString("N1");
+        maxScoreTxt.text = PlayerPrefs.GetFloat("maxBestScore").ToString("N0");
         endPanel.SetActive(true);
     }
 
