@@ -23,6 +23,10 @@ public class card : MonoBehaviour
         transform.Find("front").gameObject.SetActive(true);
         transform.Find("back").gameObject.SetActive(false);
 
+        transform.Find("back").GetComponent<SpriteRenderer>().color = Color.grey;
+
+        gameManager.I.matchStart();
+
         if (gameManager.I.firstCard == null)
         {
             gameManager.I.firstCard = gameObject;
@@ -35,7 +39,7 @@ public class card : MonoBehaviour
     }
     public void destroyCard()
     {
-        Invoke("destroyCardInvoke", 1.0f);
+        Invoke("destroyCardInvoke", 0.3f);
     }
 
     void destroyCardInvoke()
@@ -45,7 +49,7 @@ public class card : MonoBehaviour
 
     public void closeCard()
     {
-        Invoke("closeCardInvoke", 1.0f);
+        Invoke("closeCardInvoke", 0.3f);
     }
 
     void closeCardInvoke()
