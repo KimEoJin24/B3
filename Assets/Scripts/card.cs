@@ -7,6 +7,7 @@ public class card : MonoBehaviour
     public Animator anim;
     public AudioClip flip;
     public AudioSource audioSource;
+    public int cardNumber;
 
     // Start is called before the first frame update
     void Start()
@@ -61,5 +62,15 @@ public class card : MonoBehaviour
         anim.SetBool("isOpen", false);
         transform.Find("back").gameObject.SetActive(true);
         transform.Find("front").gameObject.SetActive(false);
+    }
+
+    public void SetcardNumber(int number)
+    {
+        this.cardNumber = number;
+    }
+
+    public int GetcardNumber()
+    {
+        return cardNumber;
     }
 }

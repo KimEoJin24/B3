@@ -53,7 +53,7 @@ public class gameManager : MonoBehaviour
             float x = (i / 6) * 1.2f - 1.25f;
             float y = (i % 6) * 1.2f - 4.0f;
             newCard.transform.position = new Vector3(x, y, 0);
-
+            newCard.GetComponent<card>().SetcardNumber(teamMember[i]);
             string teamMemberName = "teamMember" + teamMember[i].ToString();
             newCard.transform.Find("front").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>(teamMemberName);
         }
@@ -108,7 +108,7 @@ public class gameManager : MonoBehaviour
         if (firstCardImage == secondCardImage)
         {
             audioSource.PlayOneShot(match);
-            successTxt.SetActive(true);
+            successMatchInvoke(firstCard.GetComponent<card>().GetcardNumber());
             firstCard.GetComponent<card>().destroyCard();
             secondCard.GetComponent<card>().destroyCard();
 
@@ -180,6 +180,28 @@ public class gameManager : MonoBehaviour
     {
         successTxt.SetActive(false);
         failTxt.SetActive(false);
+    }
+
+    public void successMatchInvoke(int teamMemberNumber)
+    {
+        switch(teamMemberNumber / 3)
+        {
+            case 0:
+                successTxt.GetComponent<Text>().text = "±è ¾î Áø";
+                successTxt.SetActive(true);
+                break;
+            case 1:
+                successTxt.GetComponent<Text>().text = "¼Û À¯ ¼·";
+                successTxt.SetActive(true);
+                break;
+            case 2:
+                successTxt.GetComponent<Text>().text = "Àå ¼º ¸²";
+                successTxt.SetActive(true);
+                break;
+            default:
+                successTxt.SetActive(true);
+                break;
+        }
     }
 }
 
