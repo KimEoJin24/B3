@@ -423,6 +423,7 @@ MonoBehaviour:
   anim: {fileID: 5137868729074531624}
   flip: {fileID: 8300000, guid: b912a7b038909de4998b5d0753eaf4c1, type: 3}
   audioSource: {fileID: -4236355407957260039}
+  cardNumber: 0
 --- !u!114 &-3973933295666256760
 MonoBehaviour:
   m_ObjectHideFlags: 0

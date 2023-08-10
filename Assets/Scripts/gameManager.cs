@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
 using UnityEngine.SceneManagement;
+using System.Linq;
+
 public class gameManager : MonoBehaviour
 {
     public Text timeTxt;
@@ -16,9 +17,12 @@ public class gameManager : MonoBehaviour
     public Text thisScoreTxt;
     public Text maxScoreTxt;
     public Text levelTxt;
+    public Text levelMaxTimeTxt;
+    public Text levelMaxMatchTxt;
     public GameObject successTxt;
     public GameObject failTxt;
     int matchCount = 0;
+    int currentLevel = 1;
     float matchtime = 5.0f;
     float time = 60.0f;
     bool isFliped = false;
@@ -40,22 +44,69 @@ public class gameManager : MonoBehaviour
     {
         Time.timeScale = 1.0f;
 
-        int currentLevel = 1;
+        string playerMaxScore = "maxScore" + currentLevel;
+        string playerMaxTimeScore = "maxTimeScore" + currentLevel;
+        string playerMaxMatchScore = "maxMatchScore" + currentLevel;
+
+        if (dataTransfer.D != null)
+        {
+            currentLevel = dataTransfer.D.getDataToSend();
+        }
+
         levelTxt.text = currentLevel.ToString();
+        int[] teamMember;
 
-        int[] teamMember = { 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8 };
-        teamMember = teamMember.OrderBy(item => Random.Range(-1.0f, 1.0f)).ToArray();
+        switch (currentLevel)
+        {
+            case 1:
+                teamMember = new int[] { 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5};
+                break;
+            case 2:
+                teamMember = new int[] { 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8 };
+                break;
+            default:
+                teamMember = new int[] { 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8 };
+                break;
+        }
+        
 
-        for (int i = 0; i < 18; i++)
+        fisherYatesShuffle(teamMember);
+
+        for (int i = 0; i < teamMember.Length; i++)
         {
             GameObject newCard = Instantiate(card);
             newCard.transform.parent = GameObject.Find("cards").transform;
-            float x = (i / 6) * 1.2f - 1.25f;
-            float y = (i % 6) * 1.2f - 4.0f;
+
+            float x;
+            float y;
+
+            switch (currentLevel)
+            {
+                case 1:
+                    x = (i / 3) * 1.2f - 1.75f;
+                    y = (i % 3) * 1.2f - 1.5f;
+                    break;
+                case 2:
+                    x = (i / 6) * 1.2f - 1.25f;
+                    y = (i % 6) * 1.2f - 4.0f;
+                    break;
+                default:
+                    x = (i / 6) * 1.2f - 1.25f;
+                    y = (i % 6) * 1.2f - 4.0f;
+                    break;
+            }
+            
             newCard.transform.position = new Vector3(x, y, 0);
             newCard.GetComponent<card>().SetcardNumber(teamMember[i]);
             string teamMemberName = "teamMember" + teamMember[i].ToString();
             newCard.transform.Find("front").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>(teamMemberName);
+
+            if (PlayerPrefs.HasKey(playerMaxScore) == true && PlayerPrefs.HasKey(playerMaxTimeScore) == true && PlayerPrefs.HasKey(playerMaxMatchScore) == true)
+            {
+                levelMaxTimeTxt.text = PlayerPrefs.GetFloat(playerMaxTimeScore).ToString("N2");
+                levelMaxMatchTxt.text = PlayerPrefs.GetInt(playerMaxMatchScore).ToString();
+
+            }
         }
     }
 
@@ -138,7 +189,9 @@ public class gameManager : MonoBehaviour
         Time.timeScale = 0.0f;
         float thisScore = 0.0f;
         float maxScore = 0.0f;
-
+        string playerMaxScore = "maxScore" + currentLevel;
+        string playerMaxTimeScore = "maxTimeScore" + currentLevel;
+        string playerMaxMatchScore = "maxMatchScore" + currentLevel;
         timeScoreTxt.text = timeTxt.text;
         matchScoreTxt.text = matchTxt.text;
 
@@ -150,19 +203,24 @@ public class gameManager : MonoBehaviour
         
         thisScoreTxt.text = thisScore.ToString("N0");
 
-        if (PlayerPrefs.HasKey("maxBestScore") == false)
+        if (PlayerPrefs.HasKey(playerMaxScore) == false || PlayerPrefs.HasKey(playerMaxTimeScore) == false || PlayerPrefs.HasKey(playerMaxMatchScore) == false)
         {
-            PlayerPrefs.SetFloat("maxBestScore", thisScore);
+            PlayerPrefs.SetFloat(playerMaxScore, thisScore);
+            PlayerPrefs.SetFloat(playerMaxTimeScore, time);
+            PlayerPrefs.SetInt(playerMaxMatchScore, matchCount);
+
         }
         else
         {
-            maxScore = PlayerPrefs.GetFloat("maxBestScore");
+            maxScore = PlayerPrefs.GetFloat(playerMaxScore);
             if (maxScore < thisScore)
             {
-                PlayerPrefs.SetFloat("maxBestScore", thisScore);
+                PlayerPrefs.SetFloat(playerMaxScore, thisScore);
+                PlayerPrefs.SetFloat(playerMaxTimeScore, time);
+                PlayerPrefs.SetInt(playerMaxMatchScore, matchCount);
             }
         }
-        maxScoreTxt.text = PlayerPrefs.GetFloat("maxBestScore").ToString("N0");
+        maxScoreTxt.text = PlayerPrefs.GetFloat(playerMaxScore).ToString("N0");
         endPanel.SetActive(true);
     }
 
@@ -184,7 +242,7 @@ public class gameManager : MonoBehaviour
 
     public void successMatchInvoke(int teamMemberNumber)
     {
-        switch(teamMemberNumber / 3)
+        switch(teamMemberNumber % 3)
         {
             case 0:
                 successTxt.GetComponent<Text>().text = "±è ¾î Áø";
@@ -201,6 +259,19 @@ public class gameManager : MonoBehaviour
             default:
                 successTxt.SetActive(true);
                 break;
+        }
+    }
+
+    void fisherYatesShuffle<T>(T[] array){
+
+        int n = array.Length;
+
+        for (int i = n - 1; i > 0; i--)
+        {
+            int j = UnityEngine.Random.Range(0, i + 1);
+            T temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
         }
     }
 }
