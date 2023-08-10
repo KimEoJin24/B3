@@ -15,6 +15,8 @@ public class gameManager : MonoBehaviour
     public GameObject firstCard;
     public GameObject secondCard;
 
+    public AudioClip match;
+    public AudioSource audioSource;
     // Start is called before the first frame update
     void Awake()
     {
@@ -53,7 +55,7 @@ public class gameManager : MonoBehaviour
 
             if (firstCardImage == secondCardImage)
             {
-
+                audioSource.PlayOneShot(match);
                 firstCard.GetComponent<card>().destroyCard();
                 secondCard.GetComponent<card>().destroyCard();
 
